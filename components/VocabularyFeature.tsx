@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './VocabularyFeature.module.css'
+import { saveHistory, getHistory, deleteHistoryItem, formatTimestamp, type HistoryItem } from '@/utils/history'
 
 interface VocabularyItem {
   english: string
@@ -26,6 +27,8 @@ export default function VocabularyFeature() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<VocabularyResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<HistoryItem[]>([])
+  const [showHistory, setShowHistory] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,6 +61,10 @@ export default function VocabularyFeature() {
 
       const data: VocabularyResponse = await response.json()
       setResult(data)
+      
+      // Save to history
+      saveHistory('vocabulary', { topic, taskType }, data)
+      setHistory(getHistory('vocabulary'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -65,8 +72,67 @@ export default function VocabularyFeature() {
     }
   }
 
+  useEffect(() => {
+    setHistory(getHistory('vocabulary'))
+  }, [])
+
+  const loadHistoryItem = (item: HistoryItem) => {
+    const input = item.input
+    setTopic(input.topic)
+    setTaskType(input.taskType)
+    setResult(item.result)
+    setShowHistory(false)
+  }
+
+  const handleDeleteHistory = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    deleteHistoryItem('vocabulary', id)
+    setHistory(getHistory('vocabulary'))
+  }
+
   return (
     <div className={styles.container}>
+      <div className={styles.historyHeader}>
+        <button
+          type="button"
+          onClick={() => setShowHistory(!showHistory)}
+          className={styles.historyButton}
+        >
+          {showHistory ? 'Hide' : 'Show'} History ({history.length})
+        </button>
+      </div>
+
+      {showHistory && history.length > 0 && (
+        <div className={styles.historyContainer}>
+          <h3 className={styles.historyTitle}>Previous Topics</h3>
+          <div className={styles.historyList}>
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className={styles.historyItem}
+                onClick={() => loadHistoryItem(item)}
+              >
+                <div className={styles.historyItemHeader}>
+                  <span className={styles.historyQuestion}>
+                    {item.input.topic} ({item.input.taskType})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteHistory(item.id, e)}
+                    className={styles.deleteButton}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className={styles.historyMeta}>
+                  {formatTimestamp(item.timestamp)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="topic">Topic</label>

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './SpeakingFeature.module.css'
+import { saveHistory, getHistory, deleteHistoryItem, formatTimestamp, type HistoryItem } from '@/utils/history'
 
 interface AnswerResponse {
   band: string
@@ -27,6 +28,8 @@ export default function SpeakingFeature() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<AnswerResponse[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<HistoryItem[]>([])
+  const [showHistory, setShowHistory] = useState(false)
 
   const bandOptions = ['7', '8', '9']
 
@@ -75,11 +78,34 @@ export default function SpeakingFeature() {
 
       const data: ApiResponse = await response.json()
       setResults(data.results)
+      
+      // Save to history
+      saveHistory('speaking', { question, part, bands: selectedBands }, data.results)
+      setHistory(getHistory('speaking'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    setHistory(getHistory('speaking'))
+  }, [])
+
+  const loadHistoryItem = (item: HistoryItem) => {
+    const input = item.input
+    setQuestion(input.question)
+    setPart(input.part)
+    setSelectedBands(input.bands)
+    setResults(item.result)
+    setShowHistory(false)
+  }
+
+  const handleDeleteHistory = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    deleteHistoryItem('speaking', id)
+    setHistory(getHistory('speaking'))
   }
 
   const highlightText = (text: string, vocab: AnswerResponse['vocabulary'], structures: AnswerResponse['structures']) => {
@@ -138,6 +164,48 @@ export default function SpeakingFeature() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.historyHeader}>
+        <button
+          type="button"
+          onClick={() => setShowHistory(!showHistory)}
+          className={styles.historyButton}
+        >
+          {showHistory ? 'Hide' : 'Show'} History ({history.length})
+        </button>
+      </div>
+
+      {showHistory && history.length > 0 && (
+        <div className={styles.historyContainer}>
+          <h3 className={styles.historyTitle}>Previous Questions</h3>
+          <div className={styles.historyList}>
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className={styles.historyItem}
+                onClick={() => loadHistoryItem(item)}
+              >
+                <div className={styles.historyItemHeader}>
+                  <span className={styles.historyQuestion}>
+                    {item.input.question.substring(0, 60)}
+                    {item.input.question.length > 60 ? '...' : ''}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteHistory(item.id, e)}
+                    className={styles.deleteButton}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className={styles.historyMeta}>
+                  Part {item.input.part} • Bands: {item.input.bands.join(', ')} • {formatTimestamp(item.timestamp)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="question">Question</label>

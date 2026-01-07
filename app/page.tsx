@@ -68,7 +68,7 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.header}>
         <h1 className={styles.title}>
-          IELTS Assistant
+          English Assistant
         </h1>
         <div className={styles.userSection}>
           <span className={styles.username}>Welcome, {username}</span>

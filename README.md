@@ -1,4 +1,4 @@
-# IELTS Assistant
+# English Assistant
 
 An OpenAI-based Next.js application to assist with IELTS exam preparation.
 

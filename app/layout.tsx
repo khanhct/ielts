@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'IELTS Assistant - Speaking Practice',
-  description: 'AI-powered IELTS Speaking exam assistant',
+  title: 'English Assistant - Speaking Practice',
+  description: 'AI-powered English exam assistant',
 }
 
 export default function RootLayout({

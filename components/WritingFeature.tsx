@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import styles from './WritingFeature.module.css'
+import { saveHistory, getHistory, deleteHistoryItem, formatTimestamp, type HistoryItem } from '@/utils/history'
 
 interface WritingResponse {
   band: string
@@ -29,6 +30,8 @@ export default function WritingFeature() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<WritingResponse[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<HistoryItem[]>([])
+  const [showHistory, setShowHistory] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -144,11 +147,40 @@ export default function WritingFeature() {
 
       const data: ApiResponse = await response.json()
       setResults(data.results)
+      
+      // Save to history (without image base64 to save space)
+      saveHistory('writing', { 
+        input, 
+        hasImage: !!image, 
+        taskType, 
+        bands: selectedBands 
+      }, data.results)
+      setHistory(getHistory('writing'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    setHistory(getHistory('writing'))
+  }, [])
+
+  const loadHistoryItem = (item: HistoryItem) => {
+    const input = item.input
+    setInput(input.input || '')
+    setTaskType(input.taskType)
+    setSelectedBands(input.bands)
+    setImage(null) // Don't restore image from history
+    setResults(item.result)
+    setShowHistory(false)
+  }
+
+  const handleDeleteHistory = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    deleteHistoryItem('writing', id)
+    setHistory(getHistory('writing'))
   }
 
   const highlightText = (text: string, vocab: WritingResponse['vocabulary'], structures: WritingResponse['structures']) => {
@@ -207,6 +239,47 @@ export default function WritingFeature() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.historyHeader}>
+        <button
+          type="button"
+          onClick={() => setShowHistory(!showHistory)}
+          className={styles.historyButton}
+        >
+          {showHistory ? 'Hide' : 'Show'} History ({history.length})
+        </button>
+      </div>
+
+      {showHistory && history.length > 0 && (
+        <div className={styles.historyContainer}>
+          <h3 className={styles.historyTitle}>Previous Prompts</h3>
+          <div className={styles.historyList}>
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className={styles.historyItem}
+                onClick={() => loadHistoryItem(item)}
+              >
+                <div className={styles.historyItemHeader}>
+                  <span className={styles.historyQuestion}>
+                    {item.input.input ? (item.input.input.substring(0, 60) + (item.input.input.length > 60 ? '...' : '')) : (item.input.hasImage ? '[Image]' : '')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteHistory(item.id, e)}
+                    className={styles.deleteButton}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className={styles.historyMeta}>
+                  Task {item.input.taskType} • Bands: {item.input.bands.join(', ')} • {formatTimestamp(item.timestamp)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="input">Question / Prompt (Text or Image)</label>
