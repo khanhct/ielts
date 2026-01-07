@@ -17,6 +17,8 @@ An OpenAI-based Next.js application to assist with IELTS exam preparation, start
 
 ## Setup
 
+### Local Development
+
 1. Install dependencies:
 ```bash
 npm install
@@ -34,6 +36,27 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Docker Setup
+
+1. Create a `.env` file in the root directory:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+2. Build and run with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+3. The application will be available at [http://localhost:3000](http://localhost:3000)
+
+### Docker Commands
+
+- Build and start: `docker-compose up -d`
+- Stop: `docker-compose down`
+- View logs: `docker-compose logs -f`
+- Rebuild: `docker-compose up -d --build`
+
 ## Tech Stack
 
 - Next.js 14 (App Router)
@@ -41,3 +64,4 @@ npm run dev
 - TypeScript
 - OpenAI API
 - CSS Modules
+- Docker
