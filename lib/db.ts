@@ -14,6 +14,15 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS vocal_learning_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    input_words TEXT NOT NULL,
+    results_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
 export interface Lesson {
   id?: number;
   name: string;

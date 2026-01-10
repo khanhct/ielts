@@ -13,6 +13,10 @@
 - ✅ Implemented Lesson feature with SQLite storage
 - ✅ Added Markdown rendering for lessons
 - ✅ Added functionality to update existing lessons
+- ✅ Updated Vocabulary Learn feature to include base verb forms and usage patterns
+- ✅ Changed Vocabulary Learn storage to be session-based (per turn) instead of per-word
+- ✅ Refined Vocabulary Learn output: Verb Phrases now include both verb patterns and noun collocations; removed separate pattern line in Verb section.
+- ✅ Updated Verb section format in Vocabulary Learn to: `verb(v):/pronunciation/ meaning`.
 
 ## Implementation Details
 
@@ -21,6 +25,12 @@
 - **Frontend**: `LessonFeature.tsx` component with form, list view, and update capabilities
 - **API**: `/api/lessons` for GET, POST, and PUT operations
 - **Rendering**: `react-markdown` for lesson content display
+
+### Vocabulary Learn Feature
+- **Storage**: `vocal_learning_sessions` table in SQLite
+- **Frontend**: `VocabularyLearn.tsx` with detailed breakdown including base verb forms and synonyms
+- **API**: `/api/vocabulary-learn` for session-based storage of word breakdowns
+- **Logic**: Automatically identifies base verbs and usage patterns for input words (e.g., contribution -> contribute)
 
 ### Speaking Feature Component
 - Form with three inputs: Question (textarea), Part (select), Bands (multi-select buttons)

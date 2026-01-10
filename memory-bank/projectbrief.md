@@ -27,6 +27,12 @@ IELTS Assistant is an OpenAI-based Next.js application designed to help students
   - List available lessons
   - View lesson details with rendered Markdown
 
+### Vocabulary Learning Feature
+- **Word-based Learning:**
+  - Input: List of words separated by commas
+  - Output: Structured breakdown including type, pronunciation, meaning, verb forms, phrases, and synonyms
+- **Storage:** Results stored in SQLite for history tracking
+
 ## Goals
 - Provide accurate, band-appropriate IELTS speaking answers
 - Help students learn advanced vocabulary and structures
