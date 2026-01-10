@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const wordList = words.split(',').map(w => w.trim()).filter(w => w.length > 0)
 
-    const prompt = `You are an expert English teacher. For each of the following words, provide a detailed breakdown in Vietnamese and English.
+    const prompt = `You are an expert IELTS examiner and English teacher. For each of the following words, provide a detailed breakdown in Vietnamese and English, focusing on high-band IELTS usage.
 Words: ${wordList.join(', ')}
 
 IMPORTANT REQUIREMENTS:
@@ -93,7 +93,7 @@ Return ONLY the JSON object.`
       messages: [
         {
           role: 'system',
-          content: 'You are an expert English teacher. Always respond with a valid JSON object containing a "results" array.'
+          content: 'You are an expert IELTS examiner and English teacher. Always respond with a valid JSON object containing a "results" array of high-band IELTS vocabulary.'
         },
         {
           role: 'user',
