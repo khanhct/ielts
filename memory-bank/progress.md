@@ -17,8 +17,9 @@
 
 ### Lesson Feature
 - ✅ Database schema for lessons
-- ✅ API routes for CRUD operations (Create, Read)
+- ✅ API routes for CRUD operations (Create, Read, Update)
 - ✅ UI for adding new lessons
+- ✅ UI for updating existing lessons
 - ✅ UI for listing and viewing lessons
 - ✅ Markdown rendering support
 

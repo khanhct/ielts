@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Plus, X, BookOpen, Clock } from 'lucide-react';
+import { Plus, X, BookOpen, Clock, Edit2 } from 'lucide-react';
 import styles from './LessonFeature.module.css';
 
 interface Lesson {
@@ -19,6 +19,7 @@ export default function LessonFeature() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingLessonId, setEditingLessonId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchLessons();
@@ -42,23 +43,37 @@ export default function LessonFeature() {
 
     setIsLoading(true);
     try {
+      const isEditing = editingLessonId !== null;
       const response = await fetch('/api/lessons', {
-        method: 'POST',
+        method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, content }),
+        body: JSON.stringify({ 
+          id: editingLessonId, 
+          name, 
+          content 
+        }),
       });
 
       if (response.ok) {
         setName('');
         setContent('');
         setShowForm(false);
+        setEditingLessonId(null);
         fetchLessons();
       }
     } catch (error) {
-      console.error('Failed to create lesson:', error);
+      console.error(`Failed to ${editingLessonId ? 'update' : 'create'} lesson:`, error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEdit = (lesson: Lesson) => {
+    setName(lesson.name);
+    setContent(lesson.content);
+    setEditingLessonId(lesson.id);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -68,7 +83,16 @@ export default function LessonFeature() {
         <button 
           className={styles.submitButton} 
           style={{ width: 'auto' }}
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (showForm) {
+              setShowForm(false);
+              setEditingLessonId(null);
+              setName('');
+              setContent('');
+            } else {
+              setShowForm(true);
+            }
+          }}
         >
           {showForm ? 'Cancel' : (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -80,7 +104,7 @@ export default function LessonFeature() {
 
       {showForm && (
         <section className={styles.formSection}>
-          <h2 className={styles.formTitle}>Create New Lesson</h2>
+          <h2 className={styles.formTitle}>{editingLessonId ? 'Update Lesson' : 'Create New Lesson'}</h2>
           <form onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
               <label className={styles.label}>Lesson Name</label>
@@ -107,7 +131,7 @@ export default function LessonFeature() {
               className={styles.submitButton}
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : 'Save Lesson'}
+              {isLoading ? 'Saving...' : (editingLessonId ? 'Update Lesson' : 'Save Lesson')}
             </button>
           </form>
         </section>
@@ -121,13 +145,23 @@ export default function LessonFeature() {
               <Clock size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
               {new Date(lesson.created_at).toLocaleDateString()}
             </div>
-            <button 
-              className={styles.viewButton}
-              onClick={() => setSelectedLesson(lesson)}
-            >
-              <BookOpen size={16} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-              Read Lesson
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button 
+                className={styles.viewButton}
+                onClick={() => setSelectedLesson(lesson)}
+              >
+                <BookOpen size={16} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                Read
+              </button>
+              <button 
+                className={styles.viewButton}
+                style={{ color: '#059669' }}
+                onClick={() => handleEdit(lesson)}
+              >
+                <Edit2 size={16} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                Edit
+              </button>
+            </div>
           </div>
         ))}
       </div>

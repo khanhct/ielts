@@ -12,13 +12,14 @@
 - ✅ Added error handling and loading states
 - ✅ Implemented Lesson feature with SQLite storage
 - ✅ Added Markdown rendering for lessons
+- ✅ Added functionality to update existing lessons
 
 ## Implementation Details
 
 ### Lesson Feature
 - **Storage**: SQLite database (`ielts.db`) using `better-sqlite3`
-- **Frontend**: `LessonFeature.tsx` component with form and list view
-- **API**: `/api/lessons` for GET and POST operations
+- **Frontend**: `LessonFeature.tsx` component with form, list view, and update capabilities
+- **API**: `/api/lessons` for GET, POST, and PUT operations
 - **Rendering**: `react-markdown` for lesson content display
 
 ### Speaking Feature Component
