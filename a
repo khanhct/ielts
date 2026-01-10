@@ -1,0 +1,64 @@
+# Map for WebSocket upgrade (must be at http level, before server blocks)
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+server {
+    listen 80;
+    server_name nia-commerce-agent-ph-d-cl.niteco.dev;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name nia-commerce-agent-ph-d-cl.niteco.dev;
+
+    ssl_certificate /etc/ssl/certs/nia-commerce-agent-ph-d-cl.niteco.dev.cer;
+    ssl_certificate_key /etc/ssl/private/nia-commerce-agent-ph-d-cl.niteco.dev.key;
+
+    # Increase buffer sizes for large requests
+    client_max_body_size 10M;
+    proxy_buffering off;
+    proxy_request_buffering off;
+
+    # Handle Next.js static files
+    location /_next/static/ {
+        proxy_pass http://10.10.20.45:3001;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_valid 200 60m;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Handle Next.js API routes
+    location /api/ {
+        proxy_pass http://10.10.20.45:3001;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
+
+    # Handle all other requests
+    location / {
+        proxy_pass http://10.10.20.45:3001;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 86400s;
+        proxy_connect_timeout 75s;
+    }
+}
+
