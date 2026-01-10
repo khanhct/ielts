@@ -15,6 +15,13 @@
 - ✅ Responsive design for mobile and desktop
 - ✅ Error handling and loading states
 
+### Lesson Feature
+- ✅ Database schema for lessons
+- ✅ API routes for CRUD operations (Create, Read)
+- ✅ UI for adding new lessons
+- ✅ UI for listing and viewing lessons
+- ✅ Markdown rendering support
+
 ### Technical Infrastructure
 - ✅ Next.js 14 App Router setup
 - ✅ TypeScript configuration

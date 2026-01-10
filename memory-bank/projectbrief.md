@@ -18,6 +18,15 @@ IELTS Assistant is an OpenAI-based Next.js application designed to help students
     - Vocabulary: English term → Vietnamese meaning
     - Structures: English structure → Vietnamese explanation
 
+### Lesson Feature
+- **Input Fields:**
+  - Name: Title of the lesson
+  - Content: Lesson text in Markdown format
+- **Functionality:**
+  - Create and store lessons in SQLite
+  - List available lessons
+  - View lesson details with rendered Markdown
+
 ## Goals
 - Provide accurate, band-appropriate IELTS speaking answers
 - Help students learn advanced vocabulary and structures

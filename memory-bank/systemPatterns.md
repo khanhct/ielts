@@ -3,9 +3,14 @@
 ## Architecture
 - **Frontend**: Next.js App Router with React Server Components and Client Components
 - **API**: Next.js API Routes (app/api)
+- **Database**: SQLite for persistent storage of lessons
 - **AI Integration**: OpenAI GPT-4 via API route
 
 ## Key Technical Decisions
+
+### Database
+- Use `better-sqlite3` for simplicity and performance in a Node.js/Next.js environment
+- Schema: `lessons` table with `id`, `name`, `content`, and `created_at`
 
 ### Component Structure
 - `app/page.tsx`: Main page with Speaking feature

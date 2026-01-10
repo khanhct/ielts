@@ -5,6 +5,9 @@
 - **React 18.3.1**: UI library
 - **TypeScript 5.5.3**: Type safety
 - **OpenAI SDK 4.52.0**: Official OpenAI API client
+- **better-sqlite3**: High-performance SQLite3 library for Node.js
+- **react-markdown**: Markdown rendering component
+- **lucide-react**: Icon library
 
 ## Development Setup
 
