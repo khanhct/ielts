@@ -17,6 +17,7 @@
 - ✅ Changed Vocabulary Learn storage to be session-based (per turn) instead of per-word
 - ✅ Refined Vocabulary Learn output: Verb Phrases now include both verb patterns and noun collocations; removed separate pattern line in Verb section.
 - ✅ Updated Verb section format in Vocabulary Learn to: `verb(v):/pronunciation/ meaning`.
+- ✅ Set role for Vocabulary Learn to "IELTS Expert" to provide high-band exam-focused content.
 
 ## Implementation Details
 
