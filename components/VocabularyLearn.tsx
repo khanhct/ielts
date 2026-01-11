@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trash2, Loader2, BookOpen, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, Loader2, BookOpen, Clock, ChevronDown, ChevronUp, Gamepad2, X } from 'lucide-react';
 import styles from './VocabularyLearn.module.css';
+import FlashcardGame from './Game/FlashcardGame';
 
 interface VerbPhrase {
   phrase: string;
@@ -38,6 +39,7 @@ export default function VocabularyLearn() {
   const [results, setResults] = useState<VocabularyLearnItem[]>([]);
   const [history, setHistory] = useState<VocalSession[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [gameSession, setGameSession] = useState<VocalSession | null>(null);
 
   useEffect(() => {
     fetchHistory();
@@ -123,6 +125,24 @@ export default function VocabularyLearn() {
             ) : 'Learn Now'}
           </button>
         </form>
+        {results.length > 0 && (
+          <button 
+            className={styles.submitButton}
+            style={{ marginTop: '1rem', background: '#8b5cf6' }}
+            onClick={() => {
+              const session = {
+                id: 0,
+                input_words: "Current Session",
+                results_json: JSON.stringify(results),
+                created_at: new Date().toISOString()
+              };
+              setGameSession(session);
+            }}
+          >
+            <Gamepad2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            Play Matching Game
+          </button>
+        )}
       </section>
 
       {results.length > 0 && (
@@ -171,6 +191,14 @@ export default function VocabularyLearn() {
                     <BookOpen size={18} />
                   </button>
                   <button 
+                    onClick={() => setGameSession(session)}
+                    className={styles.deleteBtn}
+                    style={{ color: '#8b5cf6' }}
+                    title="Play Game"
+                  >
+                    <Gamepad2 size={18} />
+                  </button>
+                  <button 
                     onClick={() => handleDelete(session.id)} 
                     className={styles.deleteBtn}
                     title="Delete"
@@ -183,6 +211,24 @@ export default function VocabularyLearn() {
           </div>
         )}
       </section>
+
+      {gameSession && (
+        <div className={styles.modalOverlay} onClick={() => setGameSession(null)}>
+          <div className={styles.modalContent} style={{ maxWidth: '900px', background: 'white', padding: '2rem', borderRadius: '12px', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button 
+              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }} 
+              onClick={() => setGameSession(null)}
+            >
+              <X size={24} />
+            </button>
+            <FlashcardGame 
+              lessonContent={gameSession.results_json} 
+              lessonName={gameSession.input_words}
+              onClose={() => setGameSession(null)} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

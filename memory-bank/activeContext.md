@@ -18,6 +18,8 @@
 - ✅ Refined Vocabulary Learn output: Verb Phrases now include both verb patterns and noun collocations; removed separate pattern line in Verb section.
 - ✅ Updated Verb section format in Vocabulary Learn to: `verb(v):/pronunciation/ meaning`.
 - ✅ Set role for Vocabulary Learn to "IELTS Expert" to provide high-band exam-focused content.
+- ✅ Implemented interactive Flashcard Matching Game for Lessons.
+- ✅ Added AI-powered vocabulary extraction for lesson games.
 
 ## Implementation Details
 

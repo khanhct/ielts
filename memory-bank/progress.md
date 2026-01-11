@@ -22,6 +22,13 @@
 - ✅ UI for updating existing lessons
 - ✅ UI for listing and viewing lessons
 - ✅ Markdown rendering support
+- ✅ Interactive Vocabulary Matching Game for each lesson
+
+### Vocabulary Learning Feature
+- ✅ Database schema for vocabulary sessions
+- ✅ API route for detailed word breakdown (IELTS Expert role)
+- ✅ UI for word-based learning (Topic and Word sub-tabs)
+- ✅ Automatic base verb and pattern identification
 
 ### Technical Infrastructure
 - ✅ Next.js 14 App Router setup
