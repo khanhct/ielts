@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Plus, X, BookOpen, Clock, Edit2 } from 'lucide-react';
+import { Plus, X, BookOpen, Clock, Edit2, Gamepad2 } from 'lucide-react';
 import styles from './LessonFeature.module.css';
+import FlashcardGame from './Game/FlashcardGame';
 
 interface Lesson {
   id: number;
@@ -20,6 +21,7 @@ export default function LessonFeature() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingLessonId, setEditingLessonId] = useState<number | null>(null);
+  const [gameLesson, setGameLesson] = useState<Lesson | null>(null);
 
   useEffect(() => {
     fetchLessons();
@@ -161,6 +163,14 @@ export default function LessonFeature() {
                 <Edit2 size={16} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
                 Edit
               </button>
+              <button 
+                className={styles.viewButton}
+                style={{ color: '#8b5cf6' }}
+                onClick={() => setGameLesson(lesson)}
+              >
+                <Gamepad2 size={16} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                Game
+              </button>
             </div>
           </div>
         ))}
@@ -172,10 +182,39 @@ export default function LessonFeature() {
             <button className={styles.closeButton} onClick={() => setSelectedLesson(null)}>
               <X size={24} />
             </button>
-            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', marginBottom: '1rem' }}>{selectedLesson.name}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.875rem', fontWeight: '700' }}>{selectedLesson.name}</h2>
+              <button 
+                className={styles.submitButton} 
+                style={{ width: 'auto', background: '#8b5cf6' }}
+                onClick={() => {
+                  const lesson = selectedLesson;
+                  setSelectedLesson(null);
+                  setGameLesson(lesson);
+                }}
+              >
+                <Gamepad2 size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                Play Matching Game
+              </button>
+            </div>
             <div className={styles.markdown}>
               <ReactMarkdown>{selectedLesson.content}</ReactMarkdown>
             </div>
+          </div>
+        </div>
+      )}
+
+      {gameLesson && (
+        <div className={styles.modalOverlay} onClick={() => setGameLesson(null)}>
+          <div className={styles.modalContent} style={{ maxWidth: '900px' }} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeButton} onClick={() => setGameLesson(null)}>
+              <X size={24} />
+            </button>
+            <FlashcardGame 
+              lessonContent={gameLesson.content} 
+              lessonName={gameLesson.name}
+              onClose={() => setGameLesson(null)} 
+            />
           </div>
         </div>
       )}
