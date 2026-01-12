@@ -99,3 +99,30 @@
   background: #4f46e5;
 }
 
+@media (max-width: 768px) {
+  .gameContainer {
+    padding: 10px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    padding: 10px;
+    font-size: 0.9rem;
+    min-height: 50px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .successTitle {
+    font-size: 1.5rem;
+  }
+}
+

@@ -361,5 +361,18 @@
   .itemsList {
     max-height: 400px;
   }
+
+  .subTabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .subTab {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 

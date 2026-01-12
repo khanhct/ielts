@@ -196,3 +196,33 @@
   margin-bottom: 1rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .formSection {
+    padding: 1rem;
+  }
+
+  .lessonList {
+    grid-template-columns: 1fr;
+  }
+
+  .modalContent {
+    padding: 1.5rem 1rem;
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .closeButton {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
