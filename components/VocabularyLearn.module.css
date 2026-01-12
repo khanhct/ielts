@@ -188,3 +188,46 @@
   position: relative;
 }
 
+@media (max-width: 768px) {
+  .inputSection {
+    padding: 1rem;
+  }
+
+  .modalContent {
+    padding: 1rem;
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .wordHeader {
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .pronunciation {
+    margin-left: 0;
+  }
+
+  .meaning {
+    font-size: 1rem;
+  }
+
+  .historyItem {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .historyWord {
+    display: block;
+    word-break: break-word;
+  }
+}
+

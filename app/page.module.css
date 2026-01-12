@@ -125,12 +125,19 @@
   }
 
   .tabs {
-    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 1rem;
     gap: 0.5rem;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tab {
-    width: 100%;
+    width: auto;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
