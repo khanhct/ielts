@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trash2, Loader2, BookOpen, Clock, ChevronDown, ChevronUp, Gamepad2, X } from 'lucide-react';
+import { Trash2, Loader2, BookOpen, Clock, ChevronDown, ChevronUp, Gamepad2, X, PenTool } from 'lucide-react';
 import styles from './VocabularyLearn.module.css';
 import FlashcardGame from './Game/FlashcardGame';
+import VocabularyFillGame from './Game/VocabularyFillGame';
 
 interface VerbPhrase {
   phrase: string;
@@ -40,6 +41,7 @@ export default function VocabularyLearn() {
   const [history, setHistory] = useState<VocalSession[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [gameSession, setGameSession] = useState<VocalSession | null>(null);
+  const [fillGameSession, setFillGameSession] = useState<VocalSession | null>(null);
 
   useEffect(() => {
     fetchHistory();
@@ -126,22 +128,40 @@ export default function VocabularyLearn() {
           </button>
         </form>
         {results.length > 0 && (
-          <button 
-            className={styles.submitButton}
-            style={{ marginTop: '1rem', background: '#8b5cf6' }}
-            onClick={() => {
-              const session = {
-                id: 0,
-                input_words: "Current Session",
-                results_json: JSON.stringify(results),
-                created_at: new Date().toISOString()
-              };
-              setGameSession(session);
-            }}
-          >
-            <Gamepad2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Play Matching Game
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <button 
+              className={styles.submitButton}
+              style={{ background: '#8b5cf6' }}
+              onClick={() => {
+                const session = {
+                  id: 0,
+                  input_words: "Current Session",
+                  results_json: JSON.stringify(results),
+                  created_at: new Date().toISOString()
+                };
+                setGameSession(session);
+              }}
+            >
+              <Gamepad2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+              Matching Game
+            </button>
+            <button 
+              className={styles.submitButton}
+              style={{ background: '#10b981' }}
+              onClick={() => {
+                const session = {
+                  id: 0,
+                  input_words: "Current Session",
+                  results_json: JSON.stringify(results),
+                  created_at: new Date().toISOString()
+                };
+                setFillGameSession(session);
+              }}
+            >
+              <PenTool size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+              Fill Game
+            </button>
+          </div>
         )}
       </section>
 
@@ -194,9 +214,17 @@ export default function VocabularyLearn() {
                     onClick={() => setGameSession(session)}
                     className={styles.deleteBtn}
                     style={{ color: '#8b5cf6' }}
-                    title="Play Game"
+                    title="Matching Game"
                   >
                     <Gamepad2 size={18} />
+                  </button>
+                  <button 
+                    onClick={() => setFillGameSession(session)}
+                    className={styles.deleteBtn}
+                    style={{ color: '#10b981' }}
+                    title="Fill Game"
+                  >
+                    <PenTool size={18} />
                   </button>
                   <button 
                     onClick={() => handleDelete(session.id)} 
@@ -229,7 +257,75 @@ export default function VocabularyLearn() {
           </div>
         </div>
       )}
+
+      {fillGameSession && (
+        <div className={styles.modalOverlay} onClick={() => setFillGameSession(null)}>
+          <div className={styles.modalContent} style={{ maxWidth: '900px', background: 'white', padding: '2rem', borderRadius: '12px', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <FillGameWrapper 
+              session={fillGameSession}
+              onClose={() => setFillGameSession(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function FillGameWrapper({ session, onClose }: { session: VocalSession; onClose: () => void }) {
+  const [vocabulary, setVocabulary] = useState<Array<{ word: string; meaning: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(session.results_json);
+      if (Array.isArray(parsed)) {
+        const vocabList = parsed.map((item: VocabularyLearnItem) => ({
+          word: item.word,
+          meaning: item.meaning,
+        }));
+        setVocabulary(vocabList);
+      }
+    } catch (error) {
+      console.error('Failed to parse vocabulary data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [session.results_json]);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <Loader2 className="animate-spin" size={48} color="#6366f1" />
+        <p style={{ marginTop: '1rem', color: '#6366f1', fontWeight: 600 }}>Loading game...</p>
+      </div>
+    );
+  }
+
+  if (vocabulary.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <p>No vocabulary data available for this game.</p>
+        <button 
+          style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#6366f1', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <button 
+        style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }} 
+        onClick={onClose}
+      >
+        <X size={24} />
+      </button>
+      <VocabularyFillGame vocabulary={vocabulary} onClose={onClose} />
+    </>
   );
 }
 
