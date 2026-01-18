@@ -9,7 +9,7 @@ IELTS Assistant is an OpenAI-based Next.js application designed to help students
 - **Input Fields:**
   - Question: Text input for IELTS speaking questions
   - Part: Selection dropdown (Part 1, 2, or 3)
-  - Band Selections: Multiple choice selection (Band 7, 8, 9)
+  - Band Selections: Multiple choice selection (Band 7, 8, 9).
 
 - **Output:**
   - High-quality answer in English
