@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import SpeakingFeature from '@/components/SpeakingFeature'
+import SpeakingPractice from '@/components/SpeakingPractice'
 import WritingFeature from '@/components/WritingFeature'
 import WritingFixFeature from '@/components/WritingFixFeature'
 import VocabularyFeature from '@/components/VocabularyFeature'
@@ -12,7 +13,7 @@ import styles from './page.module.css'
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'speaking' | 'writing' | 'writing-fix' | 'vocabulary' | 'lessons'>('speaking')
+  const [activeTab, setActiveTab] = useState<'speaking' | 'speaking-practice' | 'writing' | 'writing-fix' | 'vocabulary' | 'lessons'>('speaking')
   const [username, setUsername] = useState<string | null>(null)
 
   useEffect(() => {
@@ -87,6 +88,12 @@ export default function Home() {
           Speaking
         </button>
         <button
+          className={`${styles.tab} ${activeTab === 'speaking-practice' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('speaking-practice')}
+        >
+          Speaking Practice
+        </button>
+        <button
           className={`${styles.tab} ${activeTab === 'writing' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('writing')}
         >
@@ -114,6 +121,7 @@ export default function Home() {
 
       <div className={styles.content}>
         {activeTab === 'speaking' && <SpeakingFeature />}
+        {activeTab === 'speaking-practice' && <SpeakingPractice />}
         {activeTab === 'writing' && <WritingFeature />}
         {activeTab === 'writing-fix' && <WritingFixFeature />}
         {activeTab === 'vocabulary' && <VocabularyFeature />}
