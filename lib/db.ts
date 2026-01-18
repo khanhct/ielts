@@ -23,10 +23,28 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS speaking_practice_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_name TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    results_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
 export interface Lesson {
   id?: number;
   name: string;
   content: string;
+  created_at?: string;
+}
+
+export interface SpeakingPracticeSession {
+  id?: number;
+  conversation_name: string;
+  topic: string;
+  results_json: string;
   created_at?: string;
 }
 
