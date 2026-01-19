@@ -8,7 +8,6 @@ const openai = new OpenAI({
 
 interface PracticeRequest {
   topic: string;
-  conversationName?: string;
   format?: 'speech' | 'conversation';
 }
 
@@ -25,18 +24,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body: PracticeRequest = await request.json();
-    const { topic, conversationName } = body;
+    const { topic, format } = body;
 
     if (!topic || typeof topic !== 'string' || !topic.trim()) {
       return NextResponse.json(
         { error: 'Topic is required' },
-        { status: 400 }
-      );
-    }
-
-    if (!conversationName || typeof conversationName !== 'string' || !conversationName.trim()) {
-      return NextResponse.json(
-        { error: 'Conversation name is required' },
         { status: 400 }
       );
     }
@@ -48,8 +40,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const format = body.format || 'speech';
-    const isConversation = format === 'conversation';
+    const speechFormat = format || 'speech';
+    const isConversation = speechFormat === 'conversation';
     const formatDescription = isConversation 
       ? 'two-person conversation/dialogue' 
       : 'single-person speech/monologue';
@@ -74,7 +66,13 @@ The user wants to practice speaking English for this work scenario: "${topic}"
 
 Generate a comprehensive practice ${formatDescription} and learning materials following these requirements:
 
-1. **${isConversation ? 'Conversation' : 'Speech'} (200-300 words)**: 
+1. **Conversation Name**: 
+   - Generate a concise, professional conversation name (3-8 words)
+   - Make it descriptive and specific to the topic
+   - Include context if relevant (e.g., "Q1 Customer Meeting - Product Demo", "Sprint Planning Team Discussion")
+   - Use title case
+
+2. **${isConversation ? 'Conversation' : 'Speech'} (200-300 words)**: 
    ${formatInstructions}
 
 2. **Vocabulary (8-12 items)**:
@@ -108,6 +106,7 @@ IMPORTANT STYLE REQUIREMENTS:
 
 Format your response as JSON:
 {
+  "conversationName": "The generated conversation name (e.g., 'Q1 Customer Meeting - Product Demo')",
   "speech": "The full ${isConversation ? 'conversation/dialogue' : 'speech'} text (200-300 words) in natural conversational style${isConversation ? '. Use dialogue format with Person A: and Person B: labels for each speaker' : ''}",
   "vocabulary": [
     {
@@ -177,7 +176,7 @@ Return ONLY valid JSON, no additional text or markdown.`;
     }
 
     // Validate response structure
-    if (!result.speech || !result.vocabulary || !result.idioms || !result.grammar || !result.sentencePatterns) {
+    if (!result.conversationName || !result.speech || !result.vocabulary || !result.idioms || !result.grammar || !result.sentencePatterns) {
       throw new Error('Invalid response format from OpenAI');
     }
 
@@ -187,7 +186,7 @@ Return ONLY valid JSON, no additional text or markdown.`;
       VALUES (?, ?, ?)
     `);
     
-    insertStmt.run(conversationName.trim(), topic.trim(), JSON.stringify(result));
+    insertStmt.run(result.conversationName.trim(), topic.trim(), JSON.stringify(result));
 
     return NextResponse.json(result);
   } catch (error) {

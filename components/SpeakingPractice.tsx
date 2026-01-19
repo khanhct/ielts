@@ -29,6 +29,7 @@ interface SentencePattern {
 }
 
 interface PracticeResponse {
+  conversationName: string;
   speech: string;
   vocabulary: VocabularyItem[];
   idioms: IdiomItem[];
@@ -100,7 +101,6 @@ export default function SpeakingPractice() {
   const [customTopic, setCustomTopic] = useState('');
   const [conversationName, setConversationName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [generatingName, setGeneratingName] = useState(false);
   const [result, setResult] = useState<PracticeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<'vocab' | 'idioms' | 'grammar' | 'patterns'>('vocab');
@@ -123,46 +123,15 @@ export default function SpeakingPractice() {
     }
   };
 
-  const generateConversationName = async (topic: string) => {
-    if (!topic) return;
-    
-    setGeneratingName(true);
-    try {
-      const response = await fetch('/api/speaking-practice/generate-name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.name) {
-          setConversationName(data.name);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to generate name:', error);
-    } finally {
-      setGeneratingName(false);
-    }
-  };
-
   const handleTopicChange = (topicId: string) => {
     setSelectedTopic(topicId);
     setCustomTopic('');
-    const topic = [...WORK_TOPICS, ...DAILY_LIFE_TOPICS].find(t => t.id === topicId);
-    if (topic && !conversationName.trim()) {
-      generateConversationName(topic.label);
-    }
   };
 
   const handleCustomTopicChange = (value: string) => {
     setCustomTopic(value);
     if (value.trim()) {
       setSelectedTopic('');
-      if (!conversationName.trim()) {
-        generateConversationName(value);
-      }
     }
   };
 
@@ -175,29 +144,6 @@ export default function SpeakingPractice() {
       return;
     }
 
-    // Auto-generate name if not provided
-    let finalName = conversationName.trim();
-    if (!finalName) {
-      setGeneratingName(true);
-      try {
-        const nameResponse = await fetch('/api/speaking-practice/generate-name', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic: topicLabel }),
-        });
-        if (nameResponse.ok) {
-          const nameData = await nameResponse.json();
-          finalName = nameData.name || topicLabel;
-        } else {
-          finalName = topicLabel;
-        }
-      } catch (error) {
-        finalName = topicLabel;
-      } finally {
-        setGeneratingName(false);
-      }
-    }
-
     setLoading(true);
     setError(null);
     setResult(null);
@@ -207,8 +153,7 @@ export default function SpeakingPractice() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          topic: topicLabel, 
-          conversationName: finalName,
+          topic: topicLabel,
           format: speechFormat 
         }),
       });
@@ -220,7 +165,7 @@ export default function SpeakingPractice() {
 
       const data: PracticeResponse = await response.json();
       setResult(data);
-      setConversationName(finalName); // Update with generated name
+      setConversationName(data.conversationName); // Update with generated name from API
       fetchHistory(); // Refresh history after saving
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -374,18 +319,14 @@ export default function SpeakingPractice() {
               className={`${styles.formatButton} ${speechFormat === 'speech' ? styles.formatButtonActive : ''}`}
               onClick={() => setSpeechFormat('speech')}
             >
-              <span className={styles.formatIcon}>🎤</span>
-              <span className={styles.formatLabel}>Single Speech</span>
-              <span className={styles.formatDescription}>One-person monologue</span>
+              Single Speech
             </button>
             <button
               type="button"
               className={`${styles.formatButton} ${speechFormat === 'conversation' ? styles.formatButtonActive : ''}`}
               onClick={() => setSpeechFormat('conversation')}
             >
-              <span className={styles.formatIcon}>💬</span>
-              <span className={styles.formatLabel}>Two-Person Conversation</span>
-              <span className={styles.formatDescription}>Dialogue between two people</span>
+              Two-Person Conversation
             </button>
           </div>
         </div>
@@ -443,34 +384,6 @@ export default function SpeakingPractice() {
             onChange={(e) => handleCustomTopicChange(e.target.value)}
             placeholder="e.g., Explaining API architecture to non-technical stakeholders"
           />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
-            Conversation Name
-            {generatingName && <span className={styles.generatingLabel}> (Generating...)</span>}
-          </label>
-          <input
-            type="text"
-            className={styles.input}
-            value={conversationName}
-            onChange={(e) => setConversationName(e.target.value)}
-            placeholder="e.g., Q1 Customer Meeting, Sprint Planning Discussion (auto-generated if empty)"
-            disabled={generatingName}
-          />
-          {conversationName && (
-            <button
-              type="button"
-              onClick={() => {
-                const topic = customTopic.trim() || (selectedTopic ? [...WORK_TOPICS, ...DAILY_LIFE_TOPICS].find(t => t.id === selectedTopic)?.label : '');
-                if (topic) generateConversationName(topic);
-              }}
-              className={styles.regenerateButton}
-              disabled={generatingName}
-            >
-              Regenerate Name
-            </button>
-          )}
         </div>
 
         {error && <div className={styles.error}>{error}</div>}
